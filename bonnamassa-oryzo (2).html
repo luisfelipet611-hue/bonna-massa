@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>BONNA MASSA — Pizza reimaginada para a era da fome</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+  --bg:#0a0a0a;
+  --bg2:#111;
+  --white:#fff;
+  --off:#f0f0f0;
+  --muted:rgba(255,255,255,0.4);
+  --border:rgba(255,255,255,0.1);
+  --red:#E8190E;
+  --red2:#ff4422;
+  --mono:'Space Mono',monospace;
+  --sans:'Inter',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--white);overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ── */
+#cur{position:fixed;width:10px;height:10px;background:#fff;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:transform .15s;}
+#curring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,255,255,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,opacity .35s,border-color .35s;}
+.cur-hover #cur{transform:translate(-50%,-50%) scale(2.5);}
+.cur-hover #curring{width:64px;height:64px;opacity:.25;border-color:rgba(232,25,14,.6);}
+.cur-click #cur{transform:translate(-50%,-50%) scale(.6);}
+@media(pointer:coarse){#cur,#curring{display:none;}body{cursor:auto;}}
+
+/* ── MAGNETIC BUTTONS ── */
+.mag{transition:transform .3s cubic-bezier(.22,1,.36,1);}
+
+/* ── NAV ── */
+nav{
+  position:fixed;inset:0 0 auto;z-index:800;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 48px;height:60px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,10,10,.85);
+  backdrop-filter:blur(20px);
+  transition:background .3s;
+}
+nav.scrolled{background:rgba(10,10,10,.97);}
+.nav-logo{font-size:.75rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;cursor:none;}
+.nav-logo span{color:var(--red);}
+.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links a{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;transition:color .2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--red);transition:width .25s;}
+.nav-links a:hover{color:#fff;}
+.nav-links a:hover::after{width:100%;}
+.nav-cart{
+  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:8px 18px;cursor:none;font-family:var(--sans);transition:all .25s;position:relative;overflow:hidden;
+}
+.nav-cart::before{content:'';position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:0;}
+.nav-cart:hover{border-color:var(--red);color:#fff;}
+.nav-cart:hover::before{transform:scaleX(1);}
+.nav-cart span,.nav-cart .cart-dot{position:relative;z-index:1;}
+.cart-dot{
+  position:absolute;top:-5px;right:-5px;width:14px;height:14px;
+  background:var(--red);border-radius:50%;font-size:.5rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(0);transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.cart-dot.on{opacity:1;transform:scale(1);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100svh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 48px 64px;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.hero-bg-img{
+  position:absolute;inset:0;z-index:0;
+  background:url('https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1800&q=85') center/cover no-repeat;
+  filter:brightness(.18) saturate(.4);
+  transform:scale(1.05);
+  transition:transform 8s ease-out;
+}
+.hero-bg-img.loaded{transform:scale(1);}
+.hero-noise{
+  position:absolute;inset:0;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:.6;pointer-events:none;
+}
+/* red vignette stripe on right */
+.hero-stripe{
+  position:absolute;right:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(to bottom,transparent,var(--red),transparent);
+  z-index:2;opacity:.4;
+}
+.hero-inner{position:relative;z-index:2;padding-top:120px;}
+.hero-pre{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:32px;display:flex;align-items:center;gap:16px;
+  opacity:0;transform:translateY(10px);animation:fadeUp .6s .3s forwards;
+}
+.hero-pre::before{content:'';width:24px;height:1px;background:var(--border);}
+
+/* ── HERO H1 — MOBILE FIX ── */
+.hero-h1{
+  font-weight:900;line-height:.9;
+  letter-spacing:-.04em;
+  margin-bottom:0;
+  /* fluid scale from 2.6rem (small phone) to 10.5rem (desktop) */
+  font-size:clamp(2.6rem, 9vw, 10.5rem);
+  /* allow wrapping so no word gets clipped */
+  overflow-wrap:break-word;
+  word-break:break-word;
+  hyphens:none;
+  opacity:0;animation:fadeUp .7s .5s forwards;
+}
+.hero-h1 .r{color:var(--red);}
+.hero-h1 .thin{font-weight:300;opacity:.45;font-style:italic;}
+/* "desnecessariamente" line: allow it to wrap naturally on small screens */
+.hero-h1 .long-word{
+  display:inline-block;
+  /* scale DOWN just this word if needed, never clip */
+  font-size:clamp(2rem, 8vw, 1em);
+  line-height:1;
+}
+
+.hero-sub-row{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-top:48px;gap:32px;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .7s .7s forwards;
+}
+.hero-tagline{
+  font-size:clamp(.85rem,1.5vw,1.1rem);
+  color:var(--muted);line-height:1.7;max-width:400px;font-weight:400;
+}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+
+/* scroll indicator */
+.hero-scroll{
+  position:absolute;bottom:64px;right:48px;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:.3;
+  animation:fadeIn 1s 1.2s both;
+}
+.hero-scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.6));animation:scrollPulse 2s ease-in-out infinite;}
+.hero-scroll-label{font-family:var(--mono);font-size:.45rem;letter-spacing:.25em;text-transform:uppercase;writing-mode:vertical-rl;}
+@keyframes scrollPulse{0%,100%{opacity:.3;transform:scaleY(.6);}50%{opacity:.8;transform:scaleY(1);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:.3;}}
+
+/* ── BUTTONS ── */
+.btn-w{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#fff;color:#000;
+  padding:13px 28px;text-decoration:none;cursor:none;
+  font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
+  transition:background .3s,color .3s,transform .2s;
+  position:relative;overflow:hidden;
+}
+.btn-w::after{content:'→';opacity:0;transform:translateX(-6px);transition:all .25s;}
+.btn-w:hover{background:var(--red);color:#fff;}
+.btn-w:hover::after{opacity:1;transform:none;}
+.btn-o{
+  display:inline-flex;align-items:center;gap:10px;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:13px 28px;text-decoration:none;cursor:none;
+  font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;
+  transition:all .25s;
+}
+.btn-o:hover{border-color:rgba(255,255,255,.35);color:#fff;}
+
+/* ── TICKER ── */
+.ticker{
+  border-bottom:1px solid var(--border);
+  height:44px;overflow:hidden;display:flex;align-items:center;
+}
+.ticker:hover .ticker-track{animation-play-state:paused;}
+.ticker-track{
+  display:flex;gap:0;white-space:nowrap;
+  animation:tick 40s linear infinite;flex-shrink:0;
+}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.2);padding:0 48px;
+  display:inline-flex;align-items:center;gap:48px;
+  transition:color .3s;
+}
+.ticker:hover .ticker-item{color:rgba(255,255,255,.4);}
+.ticker-item .dot{color:var(--red);}
+
+/* ── SECTION BASE ── */
+.section{padding:100px 48px;border-bottom:1px solid var(--border);}
+.sec-label{
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--border);}
+h2.sec-h{
+  font-size:clamp(2.5rem,6vw,7rem);font-weight:900;
+  line-height:.9;letter-spacing:-.04em;
+}
+h2.sec-h .r{color:var(--red);}
+h2.sec-h .d{opacity:.22;font-weight:300;}
+
+/* ── FEATURE ROWS ── */
+.feat-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:520px;border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.feat-row.flip .feat-text{order:2;}
+.feat-row.flip .feat-vis{order:1;}
+.feat-text{
+  padding:80px 64px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid var(--border);
+}
+.feat-row.flip .feat-text{border-right:none;border-left:1px solid var(--border);}
+.feat-num-label{
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:32px;
+}
+.feat-h{
+  font-size:clamp(1.8rem,3.5vw,3.8rem);font-weight:900;
+  line-height:.95;letter-spacing:-.03em;margin-bottom:24px;
+}
+.feat-h .r{color:var(--red);}
+.feat-p{font-size:.88rem;color:var(--muted);line-height:1.85;max-width:420px;}
+.feat-stat{
+  margin-top:40px;padding-top:32px;border-top:1px solid var(--border);
+  display:flex;gap:40px;flex-wrap:wrap;
+}
+.stat-block{}
+.stat-n{font-size:2.8rem;font-weight:900;letter-spacing:-.04em;line-height:1;
+  transition:color .3s;}
+.feat-row:hover .stat-n{color:var(--red2);}
+.stat-n .unit{font-size:1rem;font-weight:400;opacity:.5;}
+.stat-l{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+.feat-vis{
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);
+}
+.feat-vis img{
+  width:100%;height:100%;object-fit:cover;
+  filter:saturate(.35) brightness(.45);
+  transform:scale(1.08);
+  transition:filter .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1);
+}
+.feat-row:hover .feat-vis img{filter:saturate(.75) brightness(.65);transform:scale(1);}
+.feat-vis-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(232,25,14,.08),transparent 70%);
+  pointer-events:none;
+  opacity:0;transition:opacity .5s;
+}
+.feat-row:hover .feat-vis-overlay{opacity:1;}
+
+/* ── PARALLAX LINES ── */
+.parallax-lines{
+  position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
+}
+.pline{
+  position:absolute;left:0;right:0;height:1px;
+  background:rgba(255,255,255,.04);
+  transform:translateX(-100%);
+  transition:transform 1.2s cubic-bezier(.22,1,.36,1);
+}
+.feat-row:hover .pline{transform:translateX(0);}
+.pline:nth-child(1){top:25%;}
+.pline:nth-child(2){top:50%;transition-delay:.05s;}
+.pline:nth-child(3){top:75%;transition-delay:.1s;}
+
+/* ── INTERACTIVE COUNTER SECTION ── */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--border);
+}
+.stats-cell{
+  padding:56px 40px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:10px;
+  cursor:default;position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.stats-cell::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--red);transform:scaleX(0);transform-origin:left;
+  transition:transform .5s cubic-bezier(.22,1,.36,1);
+}
+.stats-cell:last-child{border-right:none;}
+.stats-cell:hover{background:rgba(255,255,255,.025);}
+.stats-cell:hover::before{transform:scaleX(1);}
+.stats-big{font-size:3.2rem;font-weight:900;letter-spacing:-.04em;line-height:1;}
+.stats-big .r{color:var(--red);}
+.stats-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+
+/* ── TEMPERATURE WIDGET ── */
+.widget-section{
+  border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:480px;
+}
+.widget-text{
+  padding:80px 64px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid var(--border);
+}
+.widget-panel{
+  padding:64px 56px;
+  display:flex;flex-direction:column;justify-content:center;gap:24px;
+}
+.w-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+
+/* Custom slider */
+.temp-slider-wrap{position:relative;padding:8px 0;}
+.temp-slider{
+  width:100%;appearance:none;background:transparent;height:2px;outline:none;cursor:pointer;
+  position:relative;z-index:1;
+}
+.temp-track{
+  position:absolute;top:50%;left:0;right:0;height:2px;
+  background:var(--border);transform:translateY(-50%);pointer-events:none;
+}
+.temp-fill{
+  position:absolute;top:50%;left:0;height:2px;
+  background:var(--red);transform:translateY(-50%);pointer-events:none;
+  transition:width .05s;
+}
+.temp-slider::-webkit-slider-thumb{
+  appearance:none;width:20px;height:20px;
+  background:#fff;border-radius:50%;cursor:pointer;
+  box-shadow:0 0 0 0 rgba(232,25,14,0);
+  transition:box-shadow .25s,transform .15s;
+}
+.temp-slider::-webkit-slider-thumb:hover{
+  box-shadow:0 0 0 6px rgba(232,25,14,.15);
+  transform:scale(1.2);
+}
+.temp-slider::-moz-range-thumb{width:20px;height:20px;background:#fff;border-radius:50%;border:none;cursor:pointer;}
+
+.temp-display{font-size:4rem;font-weight:900;letter-spacing:-.04em;line-height:1;transition:color .4s;}
+.temp-display .unit{font-size:1.2rem;font-weight:400;opacity:.4;}
+.temp-bar{
+  height:4px;background:var(--border);overflow:hidden;margin-top:8px;
+}
+.temp-bar-fill{
+  height:100%;background:var(--red);
+  transition:width .3s cubic-bezier(.22,1,.36,1),background .4s;
+}
+.temp-desc{font-size:.78rem;color:var(--muted);line-height:1.75;margin-top:4px;transition:opacity .3s;min-height:56px;}
+.temp-emoji{font-size:2rem;line-height:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.temp-emoji:hover{transform:scale(1.2) rotate(-10deg);}
+
+/* ── ENCODER ── */
+.enc-wrap{display:flex;flex-direction:column;gap:16px;}
+.enc-input{
+  width:100%;background:transparent;border:1px solid var(--border);
+  color:#fff;padding:16px 20px;font-family:var(--sans);font-size:.85rem;
+  outline:none;resize:none;transition:border-color .25s,box-shadow .25s;
+}
+.enc-input:focus{border-color:rgba(255,255,255,.3);box-shadow:0 0 0 3px rgba(232,25,14,.08);}
+.enc-btn-row{display:flex;gap:10px;}
+.enc-btn{
+  flex:1;padding:12px 16px;background:transparent;border:1px solid var(--border);
+  color:var(--muted);font-family:var(--sans);font-size:.62rem;letter-spacing:.15em;
+  text-transform:uppercase;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.enc-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.06);transform:translateY(100%);transition:transform .25s;}
+.enc-btn:hover::before{transform:none;}
+.enc-btn:hover{border-color:rgba(255,255,255,.3);color:#fff;}
+.enc-btn.primary{background:#fff;color:#000;border-color:#fff;}
+.enc-btn.primary::before{background:var(--red);}
+.enc-btn.primary:hover{color:#fff;}
+.enc-output{
+  padding:16px 20px;border:1px solid var(--border);
+  font-family:var(--mono);font-size:.72rem;line-height:1.6;
+  color:rgba(255,255,255,.6);min-height:56px;word-break:break-all;
+  transition:border-color .25s,background .25s;
+}
+.enc-output.has-val{border-color:rgba(232,25,14,.2);background:rgba(232,25,14,.03);}
+.enc-note{font-family:var(--mono);font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.15);}
+
+/* ── MENU ── */
+.menu-section{border-bottom:1px solid var(--border);}
+.menu-top{display:flex;justify-content:space-between;align-items:flex-end;padding:80px 48px 0;flex-wrap:wrap;gap:24px;}
+.tab-row{display:flex;border:1px solid var(--border);}
+.tab{
+  padding:11px 24px;background:transparent;border:none;border-right:1px solid var(--border);
+  color:var(--muted);font-family:var(--sans);font-size:.62rem;letter-spacing:.15em;
+  text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;
+  position:relative;overflow:hidden;
+}
+.tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red);transform:scaleX(0);transition:transform .25s;}
+.tab:last-child{border-right:none;}
+.tab.on{background:#fff;color:#000;}
+.tab.on::after{display:none;}
+.tab:not(.on):hover{background:rgba(255,255,255,.05);color:#fff;}
+.tab:not(.on):hover::after{transform:scaleX(1);}
+
+.menu-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border);margin-top:48px;
+}
+.mcard{
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  overflow:hidden;cursor:none;transition:background .25s;
+  position:relative;
+}
+.mcard::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(232,25,14,.06),transparent 60%);
+  opacity:0;transition:opacity .4s;pointer-events:none;
+}
+.mcard:hover::after{opacity:1;}
+.mcard:nth-child(3n){border-right:none;}
+.mcard:hover{background:rgba(255,255,255,.02);}
+.mcard-img{display:block;width:100%;height:200px;object-fit:cover;filter:saturate(.35) brightness(.45);transition:filter .6s,transform .6s cubic-bezier(.22,1,.36,1);}
+.mcard:hover .mcard-img{filter:saturate(.7) brightness(.65);transform:scale(1.06);}
+.mcard-imgwrap{overflow:hidden;height:200px;position:relative;}
+.mcard-body{padding:28px 28px 24px;}
+.mcard-cat{font-family:var(--mono);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.25);display:block;margin-bottom:10px;}
+.mcard-name{font-size:1.1rem;font-weight:700;margin-bottom:8px;line-height:1.2;}
+.mcard-desc{font-size:.72rem;color:var(--muted);line-height:1.75;margin-bottom:20px;}
+.mcard-foot{display:flex;justify-content:space-between;align-items:center;}
+.mcard-price{font-family:var(--mono);font-size:.95rem;font-weight:700;color:var(--red2);}
+.mcard-add{
+  font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:8px 14px;cursor:pointer;font-family:var(--sans);transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.mcard-add::before{content:'';position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left;transition:transform .25s;}
+.mcard-add span{position:relative;z-index:1;}
+.mcard-add:hover{border-color:rgba(255,255,255,.3);color:#000;}
+.mcard-add:hover::before{transform:scaleX(1);}
+.mcard-add.done{border-color:rgba(40,200,80,.3);color:rgba(50,220,90,.8);}
+.mcard-add.done::before{display:none;}
+
+/* card enter animation */
+.mcard{opacity:0;transform:translateY(16px);transition:opacity .45s,transform .45s cubic-bezier(.22,1,.36,1),background .25s;}
+.mcard.vis{opacity:1;transform:none;}
+
+/* ── COMPARE ── */
+.compare-section{border-bottom:1px solid var(--border);padding:100px 48px;}
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.compare-card{
+  background:var(--bg);padding:48px 40px;
+  transition:background .3s,transform .3s cubic-bezier(.22,1,.36,1);
+  cursor:default;
+}
+.compare-card:hover{background:rgba(255,255,255,.025);transform:translateY(-4px);}
+.cc-tag{font-family:var(--mono);font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:block;}
+.cc-name{font-size:2rem;font-weight:900;letter-spacing:-.03em;margin-bottom:16px;}
+.cc-desc{font-size:.78rem;color:var(--muted);line-height:1.8;margin-bottom:32px;}
+.cc-price{font-size:2.5rem;font-weight:900;letter-spacing:-.04em;color:var(--red);margin-bottom:8px;transition:color .3s;}
+.compare-card:hover .cc-price{color:var(--red2);}
+.cc-price-note{font-family:var(--mono);font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:32px;}
+.cc-rows{border-top:1px solid var(--border);}
+.cc-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;border-bottom:1px solid var(--border);
+  font-size:.72rem;transition:padding-left .2s;
+}
+.compare-card:hover .cc-row{padding-left:4px;}
+.cc-row-label{color:var(--muted);}
+.cc-row-val{font-weight:600;font-family:var(--mono);}
+.cc-btn{
+  display:block;width:100%;margin-top:28px;padding:14px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);font-family:var(--sans);font-size:.65rem;
+  letter-spacing:.15em;text-transform:uppercase;cursor:pointer;
+  transition:all .3s;text-align:center;text-decoration:none;
+  position:relative;overflow:hidden;
+}
+.cc-btn::before{content:'';position:absolute;inset:0;background:#fff;transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);}
+.cc-btn span{position:relative;z-index:1;}
+.cc-btn:hover{color:#000;border-color:#fff;}
+.cc-btn:hover::before{transform:none;}
+.compare-card.featured{background:rgba(232,25,14,.04);border:1px solid rgba(232,25,14,.15);}
+.compare-card.featured .cc-btn{background:#fff;color:#000;border-color:#fff;}
+.compare-card.featured .cc-btn::before{background:var(--red);}
+.compare-card.featured .cc-btn:hover{color:#fff;}
+
+/* ── REVIEWS ── */
+.reviews-section{border-bottom:1px solid var(--border);padding:100px 48px;}
+.reviews-meta{display:flex;align-items:center;gap:32px;margin-bottom:64px;flex-wrap:wrap;}
+.rev-big{font-size:5rem;font-weight:900;letter-spacing:-.05em;line-height:1;}
+.rev-info{display:flex;flex-direction:column;gap:6px;}
+.rev-stars{font-size:1.2rem;letter-spacing:2px;color:var(--red);}
+.rev-count{font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.rev-card{
+  background:var(--bg);padding:40px 36px;
+  transition:background .25s,transform .3s cubic-bezier(.22,1,.36,1);
+  cursor:default;
+}
+.rev-card:hover{background:rgba(255,255,255,.025);transform:translateY(-3px);}
+.rev-score{font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:20px;}
+.rev-text{font-size:.88rem;line-height:1.85;font-style:italic;color:rgba(255,255,255,.75);margin-bottom:24px;}
+.rev-name{font-size:.82rem;font-weight:700;margin-bottom:4px;}
+.rev-role{font-family:var(--mono);font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+
+/* ── HOURS ── */
+.hours-wrap{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+.hours-left{padding:80px 64px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;}
+.hours-right{padding:80px 64px;display:flex;flex-direction:column;justify-content:center;gap:32px;}
+.hr-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 0;border-bottom:1px solid var(--border);
+  cursor:default;transition:padding-left .25s,background .2s;position:relative;overflow:hidden;
+}
+.hr-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transition:transform .25s;}
+.hr-row:hover{padding-left:12px;}
+.hr-row:hover::before{transform:scaleY(1);}
+.hr-day{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.hr-time{font-size:1.3rem;font-weight:900;letter-spacing:-.03em;}
+.hr-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,25,14,.5);}50%{box-shadow:0 0 0 5px rgba(232,25,14,0);}}
+.cta-h{font-size:clamp(1.8rem,3.5vw,3.5rem);font-weight:900;line-height:.95;letter-spacing:-.04em;margin-bottom:16px;}
+.cta-h .r{color:var(--red);}
+.cta-p{font-size:.82rem;color:var(--muted);line-height:1.85;max-width:360px;margin-bottom:32px;}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  padding:140px 48px;text-align:center;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.final-cta-bg{
+  position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 50%, rgba(232,25,14,.06), transparent);
+  pointer-events:none;
+}
+.final-cta>*:not(.final-cta-bg){position:relative;z-index:1;}
+.final-cta h2{
+  font-size:clamp(2.5rem,7vw,8rem);font-weight:900;
+  line-height:.88;letter-spacing:-.05em;margin-bottom:40px;
+}
+.final-cta h2 .r{color:var(--red);}
+.final-cta h2 .d{opacity:.2;}
+.final-sub{font-size:.88rem;color:var(--muted);max-width:480px;margin:0 auto 48px;line-height:1.85;}
+.final-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* ── FOOTER ── */
+footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 48px;height:56px;
+  border-top:1px solid var(--border);flex-wrap:wrap;gap:12px;
+}
+.foot-l{font-size:.7rem;font-weight:700;letter-spacing:.2em;}
+.foot-l span{color:var(--red);}
+.foot-links{display:flex;gap:28px;}
+.foot-links a{font-family:var(--mono);font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:none;transition:color .2s;}
+.foot-links a:hover{color:#fff;}
+.foot-r{font-family:var(--mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.18);}
+
+/* ── CART DRAWER ── */
+#cov{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s;}
+#cov.on{opacity:1;pointer-events:all;}
+#cdr{
+  position:fixed;top:0;right:-420px;bottom:0;width:400px;max-width:100vw;
+  background:#0d0d0d;border-left:1px solid var(--border);
+  z-index:1300;transition:right .4s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;
+}
+#cdr.on{right:0;}
+.cdh{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;border-bottom:1px solid var(--border);}
+.cdh-t{font-size:1rem;font-weight:700;letter-spacing:.05em;}
+.cdx{background:none;border:1px solid var(--border);color:var(--muted);font-size:.9rem;cursor:pointer;transition:all .2s;line-height:1;padding:6px 10px;}
+.cdx:hover{color:#fff;border-color:rgba(255,255,255,.3);}
+.cdb{flex:1;overflow-y:auto;padding:16px 32px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.cd-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.2);}
+.ci{display:flex;gap:12px;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
+.ci-n{font-size:.9rem;font-weight:600;flex:1;}
+.ci-p{font-family:var(--mono);font-size:.78rem;color:var(--red2);}
+.ci-q{display:flex;align-items:center;gap:8px;}
+.qb{width:24px;height:24px;background:transparent;border:1px solid var(--border);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.qb:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05);}
+.qn{font-family:var(--mono);font-size:.75rem;min-width:14px;text-align:center;}
+.cdf{padding:20px 32px 28px;border-top:1px solid var(--border);}
+.cdtrow{display:flex;justify-content:space-between;margin-bottom:16px;}
+.cdtl{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.cdtv{font-size:1.3rem;font-weight:900;letter-spacing:-.03em;}
+#cwa{
+  display:flex;width:100%;align-items:center;justify-content:center;gap:10px;
+  background:#fff;color:#000;padding:15px;text-decoration:none;
+  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;cursor:pointer;
+  transition:background .25s,color .25s;position:relative;overflow:hidden;
+}
+#cwa::before{content:'';position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,1,.36,1);}
+#cwa span{position:relative;z-index:1;}
+#cwa:hover{color:#fff;}
+#cwa:hover::before{transform:scaleX(1);}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1);}
+.rv.vis{opacity:1;transform:none;}
+.rv1{transition-delay:.1s;}.rv2{transition-delay:.2s;}.rv3{transition-delay:.3s;}
+
+/* ── RIPPLE ── */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.08);transform:scale(0);animation:rippleAnim .6s ease-out forwards;pointer-events:none;}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+/* ── PARTICLE CANVAS ── */
+#hero-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.55;}
+
+/* ── PIZZA CURSOR ── */
+#pizza-cur{
+  position:fixed;z-index:9997;pointer-events:none;
+  font-size:1.6rem;line-height:1;
+  transform:translate(-50%,-50%) scale(0) rotate(-20deg);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s;
+  opacity:0;
+}
+#pizza-cur.on{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1;}
+
+/* ── GLITCH ── */
+.glitch{position:relative;}
+.glitch::before,.glitch::after{
+  content:attr(data-text);
+  position:absolute;left:0;top:0;width:100%;height:100%;
+  clip-path:polygon(0 0,100% 0,100% 45%,0 45%);
+  opacity:0;pointer-events:none;
+}
+.glitch::before{color:#ff0040;animation:none;}
+.glitch::after{color:#00f5ff;animation:none;clip-path:polygon(0 55%,100% 55%,100% 100%,0 100%);}
+.glitch.active::before{animation:glitchTop .12s steps(2) forwards;}
+.glitch.active::after{animation:glitchBot .12s steps(2) .04s forwards;}
+@keyframes glitchTop{
+  0%{opacity:1;transform:translateX(-3px);}
+  50%{transform:translateX(3px);}
+  100%{opacity:0;transform:translateX(0);}
+}
+@keyframes glitchBot{
+  0%{opacity:1;transform:translateX(3px);}
+  50%{transform:translateX(-3px);}
+  100%{opacity:0;transform:translateX(0);}
+}
+
+/* ── TILT 3D ── */
+.tilt3d{transform-style:preserve-3d;transition:transform .08s linear,box-shadow .3s;}
+.tilt3d:hover{box-shadow:0 24px 80px rgba(0,0,0,.5);}
+
+/* ── OVEN MODE ── */
+body.oven-mode{
+  --red:#ff3300;--red2:#ff5500;
+  animation:ovenPulse 1.5s ease-in-out infinite;
+}
+@keyframes ovenPulse{
+  0%,100%{background:#0a0a0a;}
+  50%{background:#0f0500;}
+}
+.oven-banner{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--red);color:#fff;
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;
+  padding:12px 28px;z-index:9000;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap;
+}
+.oven-banner.on{transform:translateX(-50%) translateY(0);}
+
+/* ── TOAST NOTIFICATION ── */
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:8999;
+  background:#111;border:1px solid var(--border);
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;
+  padding:14px 20px;
+  transform:translateY(20px);opacity:0;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  max-width:260px;line-height:1.6;
+}
+.toast.on{transform:none;opacity:1;}
+.toast .toast-bar{
+  position:absolute;bottom:0;left:0;height:2px;background:var(--red);
+  animation:toastTimer 3s linear forwards;
+}
+@keyframes toastTimer{from{width:100%;}to{width:0;}}
+
+/* ── EASTER EGG ── */
+.egg-overlay{
+  position:fixed;inset:0;z-index:9500;
+  background:#0a0a0a;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  opacity:0;pointer-events:none;transition:opacity .5s;
+}
+.egg-overlay.on{opacity:1;pointer-events:all;}
+.egg-pizza{font-size:6rem;animation:eggSpin 1s ease-in-out infinite alternate;}
+@keyframes eggSpin{from{transform:rotate(-15deg) scale(.9);}to{transform:rotate(15deg) scale(1.1);}}
+
+/* ── INTRO ── */
+#intro{
+  position:fixed;inset:0;z-index:9999;
+  background:#050505;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.lbox{position:absolute;left:0;right:0;height:68px;background:#050505;z-index:6;pointer-events:none;}
+.lbox.top{top:0;}.lbox.bot{bottom:0;}
+.igrain{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:.7;
+}
+/* pizza tilted right */
+#ipz{
+  position:absolute;right:-520px;top:50%;
+  transform:translateY(-50%) rotate(-13deg);
+  width:520px;height:520px;z-index:2;opacity:0;
+  transition:right 1.2s cubic-bezier(.22,1,.36,1),opacity .7s,transform 1.2s cubic-bezier(.22,1,.36,1);
+}
+#ipz.on{right:-30px;opacity:1;transform:translateY(-50%) rotate(-8deg);}
+#ipz-img{width:100%;height:100%;object-fit:cover;border-radius:50%;
+  box-shadow:0 0 0 12px rgba(232,25,14,.1),0 0 100px rgba(232,25,14,.28),0 50px 120px rgba(0,0,0,.85);
+  filter:saturate(1.2) brightness(.85);
+}
+.ipz-r{position:absolute;border-radius:50%;pointer-events:none;}
+.ipz-r1{inset:-16px;border:1px solid rgba(232,25,14,.2);animation:ispin 14s linear infinite;}
+.ipz-r2{inset:-32px;border:1px dashed rgba(255,255,255,.05);animation:ispin 22s linear infinite reverse;}
+@keyframes ispin{to{transform:rotate(360deg);}}
+/* left content */
+#ileft{
+  position:absolute;left:64px;top:50%;transform:translateY(-50%);
+  z-index:3;opacity:0;transition:opacity .8s;
+}
+#ileft.on{opacity:1;}
+.ipre{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:5px;color:rgba(255,255,255,.25);
+  margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.ipreline{width:20px;height:1px;background:rgba(255,255,255,.2);}
+.istep{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--red);min-height:14px;margin-bottom:14px;transition:opacity .25s;}
+.iings{display:flex;flex-direction:column;gap:9px;margin-bottom:26px;}
+.iing{display:flex;align-items:center;gap:12px;opacity:0;transform:translateX(-16px);
+  transition:all .5s cubic-bezier(.22,1,.36,1);}
+.iing.v{opacity:1;transform:translateX(0);}
+.iing-ic{font-size:1.3rem;}
+.iing-nm{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45);}
+.iing-ck{width:13px;height:13px;border-radius:50%;border:1px solid rgba(232,25,14,.3);
+  display:flex;align-items:center;justify-content:center;font-size:.42rem;color:transparent;
+  margin-left:auto;transition:all .3s .1s;}
+.iing.v .iing-ck{background:rgba(232,25,14,.15);border-color:var(--red);color:var(--red);}
+.iprogwrap{width:180px;height:1px;background:rgba(255,255,255,.07);}
+#iprog{height:100%;background:var(--red);width:0%;transition:width .5s ease;}
+/* logo center */
+#ilogo{
+  position:absolute;inset:0;z-index:8;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .7s;
+}
+#ilogo.on{opacity:1;}
+.ilogo-txt{
+  font-size:clamp(3rem,8vw,8rem);font-weight:900;letter-spacing:-.04em;
+  transform:scale(.6);transition:transform 1s cubic-bezier(.34,1.3,.64,1);
+  filter:drop-shadow(0 0 60px rgba(232,25,14,.4));
+  line-height:1;
+}
+#ilogo.on .ilogo-txt{transform:scale(1);}
+.ilogo-txt span{color:var(--red);}
+/* curtains */
+#ctl,#ctr{
+  position:absolute;top:0;bottom:0;width:51%;z-index:9;
+  background:#050505;transition:transform 1.1s cubic-bezier(.77,0,.18,1);
+}
+#ctl{left:0;}#ctr{right:0;}
+#ctl.open{transform:translateX(-101%);}#ctr.open{transform:translateX(101%);}
+#intro.done{opacity:0;transition:opacity .9s;pointer-events:none;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .hero{padding:0 20px 56px;}
+  .hero-h1{
+    font-size:clamp(2.4rem,12vw,4.5rem);
+    letter-spacing:-.02em;
+    line-height:.92;
+  }
+  .hero-h1 .long-word{
+    font-size:clamp(2rem,10.5vw,4.5rem);
+  }
+  .hero-scroll{display:none;}
+  .section,.compare-section,.reviews-section,.final-cta{padding:64px 20px;}
+  .feat-row,.widget-section,.hours-wrap{grid-template-columns:1fr;}
+  .feat-row.flip .feat-text,.feat-row.flip .feat-vis{order:unset;}
+  .feat-text,.widget-text{padding:56px 20px;border-right:none!important;border-left:none!important;border-bottom:1px solid var(--border);}
+  .widget-panel{padding:48px 20px;}
+  .feat-vis{min-height:260px;}
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .stats-cell:nth-child(2){border-right:none;}
+  .stats-cell:nth-child(3){border-right:1px solid var(--border);}
+  .menu-top{padding:56px 20px 0;}
+  .menu-grid{grid-template-columns:1fr;}
+  .mcard{border-right:none!important;}
+  .compare-grid,.rev-grid{grid-template-columns:1fr;}
+  .hours-left{padding:56px 20px;border-right:none;border-bottom:1px solid var(--border);}
+  .hours-right{padding:56px 20px;}
+  footer{padding:16px 20px;height:auto;gap:12px;}
+  .hero-btns .btn-w,.hero-btns .btn-o{padding:12px 20px;font-size:.62rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="curring"></div>
+<div id="pizza-cur">🍕</div>
+<div class="oven-banner" id="ovenBanner">🔥 MODO FORNO ATIVADO — 380°C PERFEITO</div>
+<div class="toast" id="toast"><span id="toastMsg"></span><div class="toast-bar" id="toastBar"></div></div>
+<div class="egg-overlay" id="eggOverlay" onclick="closeEgg()">
+  <div class="egg-pizza">🍕</div>
+  <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;color:rgba(255,255,255,.6);">VOCÊ ENCONTROU O SEGREDO<br><span style="color:var(--red);">BONNA MASSA · DESDE 2013</span></div>
+  <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:8px;">clique para fechar</div>
+</div>
+
+<!-- INTRO -->
+<div id="intro">
+  <div class="igrain"></div>
+  <div class="lbox top"></div><div class="lbox bot"></div>
+  <div id="ctl"></div><div id="ctr"></div>
+  <div id="ipz">
+    <div class="ipz-r ipz-r1"></div><div class="ipz-r ipz-r2"></div>
+    <img id="ipz-img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=900&q=90" alt="Pizza"/>
+  </div>
+  <div id="ileft">
+    <div class="ipre"><span class="ipreline"></span>Campina Grande · PB</div>
+    <div class="istep" id="istep">montando sua pizza…</div>
+    <div class="iings">
+      <div class="iing" id="ii0"><span class="iing-ic">🫓</span><span class="iing-nm">Massa artesanal</span><span class="iing-ck">✓</span></div>
+      <div class="iing" id="ii1"><span class="iing-ic">🍅</span><span class="iing-nm">Molho de tomate</span><span class="iing-ck">✓</span></div>
+      <div class="iing" id="ii2"><span class="iing-ic">🧀</span><span class="iing-nm">Muçarela fresca</span><span class="iing-ck">✓</span></div>
+      <div class="iing" id="ii3"><span class="iing-ic">🌶️</span><span class="iing-nm">Calabresa especial</span><span class="iing-ck">✓</span></div>
+      <div class="iing" id="ii4"><span class="iing-ic">🔥</span><span class="iing-nm">Forno a lenha</span><span class="iing-ck">✓</span></div>
+    </div>
+    <div class="iprogwrap"><div id="iprog"></div></div>
+  </div>
+  <div id="ilogo">
+    <div class="ilogo-txt">BONNA<span>MASSA</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo" id="navLogo" title="🍕">BONNA<span>MASSA</span></div>
+  <ul class="nav-links">
+    <li><a href="#cardapio">Cardápio</a></li>
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#horarios">Horários</a></li>
+    <li><a href="https://instagram.com/bonnamassapizza" target="_blank">Instagram ↗</a></li>
+  </ul>
+  <button class="nav-cart mag" onclick="openCart()">
+    <span>Carrinho</span>
+    <span class="cart-dot" id="cdot">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-img" id="heroBg"></div>
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-noise"></div>
+  <div class="hero-stripe"></div>
+  <div class="hero-inner">
+    <div class="hero-pre">Campina Grande, PB · Delivery & Salão · Desde 2013</div>
+    <h1 class="hero-h1 glitch" data-text="A pizza mais">
+      A pizza mais<br>
+      <span class="r"><span class="long-word">desnecessariamente</span></span><br>
+      <span class="thin">sofisticada</span><br>
+      do Nordeste.
+    </h1>
+    <div class="hero-sub-row">
+      <p class="hero-tagline">Um produto físico, reimaginado para a era da fome. Provando que até a menor pizza pode parecer extraordinária.</p>
+      <div class="hero-btns">
+        <a href="#cardapio" class="btn-w mag">Ver Cardápio</a>
+        <a href="https://linktr.ee/bonnamassacg" class="btn-o mag" target="_blank">Fazer Pedido</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span class="hero-scroll-label">scroll</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-item">BONNA MASSA <span class="dot">✦</span> FORNO A LENHA <span class="dot">✦</span> CARNE DE SOL <span class="dot">✦</span> CAMPINA GRANDE <span class="dot">✦</span> DELIVERY RÁPIDO <span class="dot">✦</span> GOURMET <span class="dot">✦</span> INGREDIENTES FRESCOS <span class="dot">✦</span> MASSA ARTESANAL <span class="dot">✦</span> DESDE 2013 <span class="dot">✦</span> 14K FÃNS <span class="dot">✦</span> BONNA MASSA <span class="dot">✦</span> FORNO A LENHA <span class="dot">✦</span> CARNE DE SOL <span class="dot">✦</span> CAMPINA GRANDE <span class="dot">✦</span> DELIVERY RÁPIDO <span class="dot">✦</span> GOURMET <span class="dot">✦</span> INGREDIENTES FRESCOS <span class="dot">✦</span> MASSA ARTESANAL <span class="dot">✦</span> DESDE 2013 <span class="dot">✦</span> 14K FÃNS <span class="dot">✦</span></div>
+    <div class="ticker-item" aria-hidden="true">BONNA MASSA <span class="dot">✦</span> FORNO A LENHA <span class="dot">✦</span> CARNE DE SOL <span class="dot">✦</span> CAMPINA GRANDE <span class="dot">✦</span> DELIVERY RÁPIDO <span class="dot">✦</span> GOURMET <span class="dot">✦</span> INGREDIENTES FRESCOS <span class="dot">✦</span> MASSA ARTESANAL <span class="dot">✦</span> DESDE 2013 <span class="dot">✦</span> 14K FÃNS <span class="dot">✦</span></div>
+  </div>
+</div>
+
+<!-- FEAT 1 -->
+<div class="feat-row rv">
+  <div class="feat-text">
+    <div class="feat-num-label">// FEATURE 01 · THERMAL ENGINE</div>
+    <h3 class="feat-h">Forno a <span class="r">lenha.</span><br>Não tem substituto.</h3>
+    <p class="feat-p">Nossas pizzas são assadas em forno a lenha a temperaturas que nenhum modelo de linguagem vai conseguir replicar. A crosta crocante é uma promessa — ou devolvemos em elogios.</p>
+    <div class="feat-stat">
+      <div class="stat-block">
+        <div class="stat-n" data-count="380">0<span class="unit">°C</span></div>
+        <div class="stat-l">Temperatura do forno</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-n" data-count="4">0<span class="unit">min</span></div>
+        <div class="stat-l">Tempo de assamento</div>
+      </div>
+    </div>
+  </div>
+  <div class="feat-vis">
+    <div class="parallax-lines"><div class="pline"></div><div class="pline"></div><div class="pline"></div></div>
+    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=900&q=85" alt="Pizza forno"/>
+    <div class="feat-vis-overlay"></div>
+  </div>
+</div>
+
+<!-- FEAT 2 -->
+<div class="feat-row flip rv">
+  <div class="feat-text">
+    <div class="feat-num-label">// FEATURE 02 · FRESHNESS API</div>
+    <h3 class="feat-h">Ingredientes<br>selecionados <span class="r">diariamente.</span></h3>
+    <p class="feat-p">Zero ingredientes de data vencida — ao contrário dos dados de treinamento de alguns modelos que a gente conhece. Carne de sol real. Queijo de verdade. Sem atalhos.</p>
+    <div class="feat-stat">
+      <div class="stat-block">
+        <div class="stat-n" data-count="100">0<span class="unit">%</span></div>
+        <div class="stat-l">Ingredientes frescos</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-n" data-count="0">0<span class="unit">x</span></div>
+        <div class="stat-l">Ingredientes artificiais</div>
+      </div>
+    </div>
+  </div>
+  <div class="feat-vis">
+    <div class="parallax-lines"><div class="pline"></div><div class="pline"></div><div class="pline"></div></div>
+    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=85" alt="Ingredientes"/>
+    <div class="feat-vis-overlay"></div>
+  </div>
+</div>
+
+<!-- FEAT 3 -->
+<div class="feat-row rv">
+  <div class="feat-text">
+    <div class="feat-num-label">// FEATURE 03 · DELIVERY OPS rev.7</div>
+    <h3 class="feat-h">Delivery <span class="r">ultrassônico.</span><br>Sem drama.</h3>
+    <p class="feat-p">Nosso algoritmo proprietário de entrega — o motoboy — opera com latência mínima. A pizza chega quentinha antes de você conseguir encontrar o seu CEP correto.</p>
+    <div class="feat-stat">
+      <div class="stat-block">
+        <div class="stat-n">&lt;45<span class="unit">min</span></div>
+        <div class="stat-l">Tempo de entrega</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-n">∞</div>
+        <div class="stat-l">Satisfação garantida</div>
+      </div>
+    </div>
+  </div>
+  <div class="feat-vis">
+    <div class="parallax-lines"><div class="pline"></div><div class="pline"></div><div class="pline"></div></div>
+    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&q=85" alt="Delivery"/>
+    <div class="feat-vis-overlay"></div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-cell rv">
+    <div class="stats-big"><span class="r" data-count="10">0</span>+</div>
+    <div class="stats-label">Anos de Sabor</div>
+  </div>
+  <div class="stats-cell rv rv1">
+    <div class="stats-big"><span data-count="14">0</span><span class="r">K</span></div>
+    <div class="stats-label">Fãs no Instagram</div>
+  </div>
+  <div class="stats-cell rv rv2">
+    <div class="stats-big"><span class="r" data-count="8">0</span></div>
+    <div class="stats-label">Fatias por pizza</div>
+  </div>
+  <div class="stats-cell rv rv3">
+    <div class="stats-big">4.<span class="r">9</span></div>
+    <div class="stats-label">Avaliação média</div>
+  </div>
+</div>
+
+<!-- WIDGET: TEMPERATURA -->
+<div class="widget-section rv">
+  <div class="widget-text">
+    <div class="feat-num-label">// WIDGET 01 · THERMAL CONTROL</div>
+    <h3 class="feat-h">Calibre a sua <span class="r">temperatura.</span></h3>
+    <p class="feat-p">Cada pizza sai a exatamente 380°C. Mas você pode experimentar o que acontece com cada grau abaixo. (Spoiler: nada bom.)</p>
+    <p style="font-family:var(--mono);font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.18);margin-top:32px;">* Simulação. O forno real não tem slider.</p>
+  </div>
+  <div class="widget-panel">
+    <div>
+      <div class="w-label">Temperatura do forno</div>
+      <div class="temp-display" id="tempVal">380<span class="unit">°C</span></div>
+      <div class="temp-bar"><div class="temp-bar-fill" id="tempBarFill" style="width:65.7%"></div></div>
+    </div>
+    <div class="temp-slider-wrap">
+      <div class="temp-track"></div>
+      <div class="temp-fill" id="tempFill" style="width:65.7%"></div>
+      <input type="range" min="150" max="500" value="380" class="temp-slider" id="tempSlider" oninput="updateTemp(this.value)"/>
+    </div>
+    <div>
+      <div class="w-label">Status</div>
+      <div class="temp-desc" id="tempDesc">Perfeito. Crosta crocante garantida. Queijo derretido na medida. Aprovado pelo forno e pela equipe.</div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:20px;display:flex;align-items:center;gap:16px;">
+      <div class="temp-emoji" id="tempEmoji">🔥</div>
+      <div>
+        <div class="w-label">Classificação</div>
+        <div id="tempRating" style="font-size:1.4rem;font-weight:900;letter-spacing:-.03em;">ÓTIMO</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WIDGET: ENCODER -->
+<div class="widget-section rv" style="border-bottom:1px solid var(--border);">
+  <div class="widget-panel" style="border-right:1px solid var(--border);">
+    <div class="w-label">// WIDGET 02 · SECURE ORDER</div>
+    <div style="font-size:1.4rem;font-weight:900;letter-spacing:-.03em;margin-bottom:16px;">Pedido<br><span style="color:var(--red);">secreto.</span></div>
+    <p style="font-size:.78rem;color:var(--muted);line-height:1.8;">Escreva um pedido especial. Encode. Mande pro WhatsApp.<br>Ninguém vai entender — exceto a gente.</p>
+    <p style="font-family:var(--mono);font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.18);margin-top:16px;">* Base64. Genius.</p>
+  </div>
+  <div class="widget-panel">
+    <div class="enc-wrap">
+      <div class="w-label">Seu pedido</div>
+      <textarea class="enc-input" id="encIn" rows="3" placeholder="ex: quero a Sertaneja sem cebola…"></textarea>
+      <div class="enc-btn-row">
+        <button class="enc-btn primary" onclick="doEncode()"><span>Encode →</span></button>
+        <button class="enc-btn" onclick="doDecode()"><span>Decode</span></button>
+      </div>
+      <div class="w-label">Output</div>
+      <div class="enc-output" id="encOut">—</div>
+      <div class="enc-note">SECURE COMM PROTOCOL v0.1 · NOT A WARRANTY</div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<section class="menu-section" id="cardapio">
+  <div class="menu-top">
+    <div>
+      <div class="sec-label">Cardápio · Modelos Disponíveis</div>
+      <h2 class="sec-h">Escolha o <span class="r">seu.</span></h2>
+    </div>
+    <div class="tab-row">
+      <button class="tab on" onclick="setTab(this,'t')">Tradicionais</button>
+      <button class="tab" onclick="setTab(this,'e')">Especiais</button>
+      <button class="tab" onclick="setTab(this,'g')">Gourmet</button>
+      <button class="tab" onclick="setTab(this,'d')">Doces</button>
+    </div>
+  </div>
+  <div class="menu-grid" id="mgrid">
+
+    <!-- TRADICIONAIS -->
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Margherita"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Margherita</div><p class="mcard-desc">Molho de Tomate, Muçarela, Tomate e Manjericão</p><div class="mcard-foot"><span class="mcard-price">R$ 55,00</span><button class="mcard-add" onclick="addCart('Margherita',55,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80" alt="Calabresa"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Calabresa</div><p class="mcard-desc">Molho de Tomate, Muçarela, Calabresa e Orégano</p><div class="mcard-foot"><span class="mcard-price">R$ 58,00</span><button class="mcard-add" onclick="addCart('Calabresa',58,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Frango Catupiry"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Frango com Catupiry</div><p class="mcard-desc">Molho de Tomate, Muçarela, Frango, Catupiry e Orégano</p><div class="mcard-foot"><span class="mcard-price">R$ 65,00</span><button class="mcard-add" onclick="addCart('Frango com Catupiry',65,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Portuguesa"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Portuguesa</div><p class="mcard-desc">Molho de Tomate, Muçarela, Presunto, Ovos, Cebola e Orégano</p><div class="mcard-foot"><span class="mcard-price">R$ 62,00</span><button class="mcard-add" onclick="addCart('Portuguesa',62,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80" alt="Quatro Queijos"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Quatro Queijos</div><p class="mcard-desc">Molho de Tomate, Muçarela, Provolone, Gorgonzola e Catupiry</p><div class="mcard-foot"><span class="mcard-price">R$ 68,00</span><button class="mcard-add" onclick="addCart('Quatro Queijos',68,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="t"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Lombo Barbecue"/></div><div class="mcard-body"><span class="mcard-cat">Tradicional</span><div class="mcard-name">Lombo ao Barbecue</div><p class="mcard-desc">Molho de Tomate, Muçarela, Lombo Suíno, Bacon, Cebola e Barbecue</p><div class="mcard-foot"><span class="mcard-price">R$ 72,00</span><button class="mcard-add" onclick="addCart('Lombo ao Barbecue',72,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <!-- ESPECIAIS -->
+    <div class="mcard" data-c="e" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Sertaneja"/></div><div class="mcard-body"><span class="mcard-cat">Especial</span><div class="mcard-name">Sertaneja</div><p class="mcard-desc">Carne de Sol Desfiada, Catupiry, Muçarela, Cebola, Tomate e Coentro</p><div class="mcard-foot"><span class="mcard-price">R$ 72,00</span><button class="mcard-add" onclick="addCart('Sertaneja',72,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="e" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Frango 4 Queijos"/></div><div class="mcard-body"><span class="mcard-cat">Especial</span><div class="mcard-name">Frango aos Quatro Queijos</div><p class="mcard-desc">Frango, Muçarela, Catupiry, Provolone e Gorgonzola</p><div class="mcard-foot"><span class="mcard-price">R$ 75,00</span><button class="mcard-add" onclick="addCart('Frango 4 Queijos',75,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="e" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Carne de Sol Cream Cheese"/></div><div class="mcard-body"><span class="mcard-cat">Especial</span><div class="mcard-name">Carne de Sol com Cream Cheese</div><p class="mcard-desc">Carne de Sol Desfiada, Cream Cheese, Muçarela e Orégano</p><div class="mcard-foot"><span class="mcard-price">R$ 75,00</span><button class="mcard-add" onclick="addCart('Carne de Sol Cream Cheese',75,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="e" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Gaúcha"/></div><div class="mcard-body"><span class="mcard-cat">Especial</span><div class="mcard-name">Gaúcha</div><p class="mcard-desc">Carne de Sol, Champignon, Catupiry e Muçarela</p><div class="mcard-foot"><span class="mcard-price">R$ 80,00</span><button class="mcard-add" onclick="addCart('Gaúcha',80,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <!-- GOURMET -->
+    <div class="mcard" data-c="g" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Pepperoni"/></div><div class="mcard-body"><span class="mcard-cat">Gourmet</span><div class="mcard-name">Pepperoni</div><p class="mcard-desc">Pepperoni, Catupiry e Muçarela</p><div class="mcard-foot"><span class="mcard-price">R$ 70,00</span><button class="mcard-add" onclick="addCart('Pepperoni',70,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="g" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Bonna Charque"/></div><div class="mcard-body"><span class="mcard-cat">Gourmet</span><div class="mcard-name">Bonna Charque ao Catupiry</div><p class="mcard-desc">Carne de Charque Desfiada, Catupiry, Cebola e Muçarela</p><div class="mcard-foot"><span class="mcard-price">R$ 75,00</span><button class="mcard-add" onclick="addCart('Bonna Charque Catupiry',75,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="g" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Bonna Moda"/></div><div class="mcard-body"><span class="mcard-cat">Gourmet</span><div class="mcard-name">Bonna Moda</div><p class="mcard-desc">Frango, Calabresa, Bacon, Presunto, Ovos, Milho, Catupiry e Muçarela</p><div class="mcard-foot"><span class="mcard-price">R$ 80,00</span><button class="mcard-add" onclick="addCart('Bonna Moda',80,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="g" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80" alt="Filé Catupiry"/></div><div class="mcard-body"><span class="mcard-cat">Gourmet</span><div class="mcard-name">Filé com Catupiry</div><p class="mcard-desc">Filé, Catupiry e Muçarela</p><div class="mcard-foot"><span class="mcard-price">R$ 80,00</span><button class="mcard-add" onclick="addCart('Filé com Catupiry',80,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <!-- DOCES -->
+    <div class="mcard" data-c="d" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Chocolate Morango"/></div><div class="mcard-body"><span class="mcard-cat">Doce</span><div class="mcard-name">Chocolate com Morango</div><p class="mcard-desc">Muçarela, Chocolate ao Leite e Morangos Frescos</p><div class="mcard-foot"><span class="mcard-price">R$ 65,00</span><button class="mcard-add" onclick="addCart('Chocolate com Morango',65,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="d" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Leite Ninho Avelã"/></div><div class="mcard-body"><span class="mcard-cat">Doce</span><div class="mcard-name">Leite Ninho com Avelã</div><p class="mcard-desc">Muçarela, Chocolate ao Leite, Leite Ninho e Creme de Avelã</p><div class="mcard-foot"><span class="mcard-price">R$ 70,00</span><button class="mcard-add" onclick="addCart('Leite Ninho com Avelã',70,this)"><span>+ Adicionar</span></button></div></div></div>
+
+    <div class="mcard" data-c="d" style="display:none"><div class="mcard-imgwrap"><img class="mcard-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Cartola Chocolate"/></div><div class="mcard-body"><span class="mcard-cat">Doce</span><div class="mcard-name">Cartola com Chocolate</div><p class="mcard-desc">Banana, Leite Condensado, Muçarela e Gotas de Chocolate</p><div class="mcard-foot"><span class="mcard-price">R$ 75,00</span><button class="mcard-add" onclick="addCart('Cartola com Chocolate',75,this)"><span>+ Adicionar</span></button></div></div></div>
+
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="compare-section rv" id="sobre">
+  <div class="sec-label">Escolha o seu modelo</div>
+  <h2 class="sec-h" style="margin-bottom:48px;">Bonna <span class="r">1</span> / Pro / <span class="d">Pro Max</span></h2>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <span class="cc-tag">Bonna · Model 1</span>
+      <div class="cc-name">Tradicional</div>
+      <p class="cc-desc">O original. Refinado até parecer inevitável. Ingredientes certeiros, crosta certa, e desaparece do prato como se nunca tivesse existido.</p>
+      <div class="cc-price">R$ 55</div>
+      <div class="cc-price-note">Preço base · 35cm</div>
+      <div class="cc-rows">
+        <div class="cc-row"><span class="cc-row-label">Camadas</span><span class="cc-row-val">2</span></div>
+        <div class="cc-row"><span class="cc-row-label">Ingredientes</span><span class="cc-row-val">3–4</span></div>
+        <div class="cc-row"><span class="cc-row-label">Molho</span><span class="cc-row-val">Tomate</span></div>
+        <div class="cc-row"><span class="cc-row-label">Conectividade</span><span class="cc-row-val">WhatsApp</span></div>
+        <div class="cc-row"><span class="cc-row-label">Melhor para</span><span class="cc-row-val">Clássicos</span></div>
+      </div>
+      <a href="https://linktr.ee/bonnamassacg" class="cc-btn" target="_blank"><span>Pedir agora →</span></a>
+    </div>
+    <div class="compare-card featured">
+      <span class="cc-tag">Bonna · Pro</span>
+      <div class="cc-name">Especial</div>
+      <p class="cc-desc">Um pouco mais de presença. Carne de sol, cream cheese, ingredientes especiais — sem perder a elegância. A escolha que impressiona.</p>
+      <div class="cc-price">R$ 72</div>
+      <div class="cc-price-note">Preço base · 35cm</div>
+      <div class="cc-rows">
+        <div class="cc-row"><span class="cc-row-label">Camadas</span><span class="cc-row-val">3</span></div>
+        <div class="cc-row"><span class="cc-row-label">Ingredientes</span><span class="cc-row-val">5–7</span></div>
+        <div class="cc-row"><span class="cc-row-label">Molho</span><span class="cc-row-val">Tomate especial</span></div>
+        <div class="cc-row"><span class="cc-row-label">Conectividade</span><span class="cc-row-val">WhatsApp</span></div>
+        <div class="cc-row"><span class="cc-row-label">Melhor para</span><span class="cc-row-val">Impressionar</span></div>
+      </div>
+      <a href="https://linktr.ee/bonnamassacg" class="cc-btn" target="_blank"><span>Pedir agora →</span></a>
+    </div>
+    <div class="compare-card">
+      <span class="cc-tag">Bonna · Pro Max</span>
+      <div class="cc-name">Gourmet</div>
+      <p class="cc-desc">Satisfação máxima desnecessária. Uma plataforma de pedestal para quem leva pizza a sério — e não tem vergonha disso.</p>
+      <div class="cc-price">R$ 80</div>
+      <div class="cc-price-note">Preço base · 35cm</div>
+      <div class="cc-rows">
+        <div class="cc-row"><span class="cc-row-label">Camadas</span><span class="cc-row-val">4+</span></div>
+        <div class="cc-row"><span class="cc-row-label">Ingredientes</span><span class="cc-row-val">8–12</span></div>
+        <div class="cc-row"><span class="cc-row-label">Molho</span><span class="cc-row-val">Selecionado</span></div>
+        <div class="cc-row"><span class="cc-row-label">Conectividade</span><span class="cc-row-val">WhatsApp</span></div>
+        <div class="cc-row"><span class="cc-row-label">Melhor para</span><span class="cc-row-val">Experiências</span></div>
+      </div>
+      <a href="https://linktr.ee/bonnamassacg" class="cc-btn" target="_blank"><span>Pedir agora →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section rv">
+  <div class="sec-label">Avaliações · Reviews · Testemunhos</div>
+  <h2 class="sec-h" style="margin-bottom:48px;">As pessoas <span class="r">amam.</span><br><span class="d">Confie em nós.</span></h2>
+  <div class="reviews-meta">
+    <div class="rev-big">4.9</div>
+    <div class="rev-info">
+      <div class="rev-stars">★★★★★</div>
+      <div class="rev-count">Avaliações reais · [ 364 pedidos ]</div>
+    </div>
+  </div>
+  <div class="rev-grid">
+    <div class="rev-card"><div class="rev-score">[ 5/5 ] ★★★★★</div><p class="rev-text">"Vim esperando uma pizza. Recebi uma experiência que ameaça minha relação com qualquer outra pizzaria. Sigo sem recuperação."</p><div class="rev-name">Lucas M.</div><div class="rev-role">Cliente · Campina Grande</div></div>
+    <div class="rev-card"><div class="rev-score">[ 5/5 ] ★★★★★</div><p class="rev-text">"A Sertaneja me fez questionar se todas as pizzas que comi antes eram realmente pizzas. A resposta é não. Não eram."</p><div class="rev-name">Ana P.</div><div class="rev-role">Cliente Fiel · 3 anos</div></div>
+    <div class="rev-card"><div class="rev-score">[ 4.5/5 ] ★★★★☆</div><p class="rev-text">"Tirei meia estrela porque agora não consigo mais pedir em outro lugar. Estou preso. Mas feliz. Muito, muito feliz."</p><div class="rev-name">Fernando R.</div><div class="rev-role">Dependente Voluntário</div></div>
+    <div class="rev-card"><div class="rev-score">[ 5/5 ] ★★★★★</div><p class="rev-text">"O delivery chegou em 38 minutos. A pizza ainda estava crocante. Achei que era deepfake. Não era."</p><div class="rev-name">Mariana C.</div><div class="rev-role">Ex-cética, Convertida</div></div>
+    <div class="rev-card"><div class="rev-score">[ 5/5 ] ★★★★★</div><p class="rev-text">"Fui uma vez ao salão. Entrei sozinha, saí com 3 novos amigos e uma pizza na mão. O ambiente faz isso com a gente."</p><div class="rev-name">Priscila T.</div><div class="rev-role">Social Media Manager</div></div>
+    <div class="rev-card"><div class="rev-score">[ 5/5 ] ★★★★★</div><p class="rev-text">"Sou flat-earth believer mas acredito 100% que a Bonna Massa é a melhor pizza do universo — redondo ou não."</p><div class="rev-name">Roberto F.</div><div class="rev-role">Entusiasta de Teorias</div></div>
+  </div>
+</section>
+
+<!-- HOURS -->
+<div class="hours-wrap" id="horarios">
+  <div class="hours-left rv">
+    <div class="sec-label">Uptime · Disponibilidade</div>
+    <h2 class="sec-h" style="font-size:clamp(2rem,4vw,4.5rem);margin-bottom:0;">Quando você<br>nos <span class="r">encontra.</span></h2>
+    <div style="margin-top:48px;">
+      <div class="hr-row"><span class="hr-day">Terça – Sexta</span><span class="hr-dot"></span><span class="hr-time">18h – 23h</span></div>
+      <div class="hr-row"><span class="hr-day">Sábado</span><span class="hr-dot"></span><span class="hr-time">18h – 23h</span></div>
+      <div class="hr-row"><span class="hr-day">Domingo</span><span class="hr-dot"></span><span class="hr-time">18h – 23h</span></div>
+      <div class="hr-row"><span class="hr-day">Segunda</span><span class="hr-dot" style="background:rgba(255,255,255,.15);animation:none"></span><span class="hr-time" style="opacity:.25">Fechado</span></div>
+    </div>
+  </div>
+  <div class="hours-right rv rv2">
+    <div class="cta-h">Pronto para a melhor <span class="r">pizza da noite?</span></div>
+    <p class="cta-p">Faça seu pedido pelo link ou venha nos visitar. Delivery e salão — com a mesma obsessão de sempre.</p>
+    <a href="https://linktr.ee/bonnamassacg" class="btn-w mag" target="_blank" style="align-self:flex-start;">Fazer Pedido →</a>
+    <a href="https://wa.me/5583996796429" style="display:inline-flex;align-items:center;gap:10px;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(37,211,102,.65);text-decoration:none;border:1px solid rgba(37,211,102,.2);padding:13px 24px;align-self:flex-start;transition:all .25s;cursor:none;" target="_blank">💬 (83) 99679-6429</a>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-cta rv">
+  <div class="final-cta-bg"></div>
+  <h2>Capturamos a sua<br><span class="r">atenção</span> com pizza.<br><span class="d">Imagina pessoalmente.</span></h2>
+  <p class="final-sub">Se a gente consegue fazer você querer pizza às 3h da manhã lendo um site, imagina o que fazemos com uma pizza de verdade na sua frente.</p>
+  <div class="final-btns">
+    <a href="https://linktr.ee/bonnamassacg" class="btn-w mag" target="_blank">Fazer Pedido Agora →</a>
+    <a href="https://wa.me/5583996796429" class="btn-o" target="_blank">WhatsApp</a>
+    <a href="https://instagram.com/bonnamassapizza" class="btn-o" target="_blank">Instagram ↗</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-l">BONNA<span>MASSA</span></div>
+  <div class="foot-links">
+    <a href="https://instagram.com/bonnamassapizza" target="_blank">Instagram</a>
+    <a href="https://wa.me/5583996796429" target="_blank">WhatsApp</a>
+    <a href="https://linktr.ee/bonnamassacg" target="_blank">Pedidos</a>
+  </div>
+  <div class="foot-r">© 2025 · Campina Grande – PB · Terça–Dom · 18h–23h</div>
+</footer>
+
+<!-- CART -->
+<div id="cov" onclick="closeCart()"></div>
+<div id="cdr">
+  <div class="cdh">
+    <div class="cdh-t">Carrinho</div>
+    <button class="cdx" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cdb" id="cdb">
+    <div class="cd-empty" id="cdempty"><span style="font-size:2rem;opacity:.3;">🍕</span><span>Carrinho vazio</span></div>
+  </div>
+  <div class="cdf" id="cdfoot" style="display:none">
+    <div class="cdtrow"><span class="cdtl">Total</span><span class="cdtv" id="cdtv">R$ 0,00</span></div>
+    <a href="#" id="cwa" target="_blank"><span>💬 Finalizar pelo WhatsApp</span></a>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// INTRO ANIMATION
+// ─────────────────────────────────────────
+(function(){
+  const intro=document.getElementById('intro'),
+    ipz=document.getElementById('ipz'),
+    ileft=document.getElementById('ileft'),
+    istep=document.getElementById('istep'),
+    iprog=document.getElementById('iprog'),
+    ilogo=document.getElementById('ilogo'),
+    ctl=document.getElementById('ctl'),
+    ctr=document.getElementById('ctr');
+  document.body.style.overflow='hidden';
+  const steps=[
+    {id:'ii0',label:'abrindo a massa…',prog:20},
+    {id:'ii1',label:'espalhando o molho…',prog:40},
+    {id:'ii2',label:'muçarela por cima…',prog:60},
+    {id:'ii3',label:'calabresa e orégano…',prog:80},
+    {id:'ii4',label:'direto pro forno…',prog:100},
+  ];
+  setTimeout(()=>{ipz.classList.add('on');ileft.classList.add('on');},300);
+  let t=700;
+  steps.forEach(s=>{
+    setTimeout(()=>{
+      istep.style.opacity='0';
+      setTimeout(()=>{istep.textContent=s.label;istep.style.opacity='1';},160);
+      iprog.style.width=s.prog+'%';
+      document.getElementById(s.id).classList.add('v');
+    },t);t+=620;
+  });
+  const lt=t+300;
+  setTimeout(()=>{
+    ileft.style.transition='opacity .6s';ileft.style.opacity='0';
+    setTimeout(()=>{ilogo.classList.add('on');},400);
+    setTimeout(()=>{
+      ipz.style.transition='opacity .8s,transform .8s';
+      ipz.style.opacity='0';
+      ipz.style.transform='translateY(-50%) rotate(-16deg) scale(.82) translateX(60px)';
+    },1300);
+  },lt);
+  const ct=lt+2500;
+  setTimeout(()=>{ctl.classList.add('open');ctr.classList.add('open');},ct);
+  setTimeout(()=>{intro.style.transition='opacity .9s';intro.style.opacity='0';},ct+1000);
+  setTimeout(()=>{intro.style.display='none';document.body.style.overflow='';},ct+1900);
+})();
+
+// ─────────────────────────────────────────
+// CURSOR
+// ─────────────────────────────────────────
+const cur=document.getElementById('cur'),ring=document.getElementById('curring');
+const pizzaCur=document.getElementById('pizza-cur');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+  pizzaCur.style.left=mx+'px';pizzaCur.style.top=my+'px';
+});
+(function anim(){
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(anim);
+})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('cur-hover'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('cur-hover'));
+});
+document.addEventListener('mousedown',()=>document.body.classList.add('cur-click'));
+document.addEventListener('mouseup',()=>document.body.classList.remove('cur-click'));
+
+// Pizza cursor on images
+document.querySelectorAll('.feat-vis,.mcard-imgwrap').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    pizzaCur.classList.add('on');
+    cur.style.opacity='0';ring.style.opacity='0';
+  });
+  el.addEventListener('mouseleave',()=>{
+    pizzaCur.classList.remove('on');
+    cur.style.opacity='1';ring.style.opacity='1';
+  });
+  el.addEventListener('mousemove',e=>{
+    // pizza rotates with mouse velocity
+    pizzaCur.style.transform=`translate(-50%,-50%) scale(1) rotate(${(e.movementX||0)*3}deg)`;
+  });
+});
+
+// ─────────────────────────────────────────
+// SOUND ENGINE (Web Audio — no files needed)
+// ─────────────────────────────────────────
+let audioCtx=null;
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playPop(freq=440,dur=0.08,type='sine'){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(freq*0.5,ctx.currentTime+dur);
+    g.gain.setValueAtTime(0.12,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.start();o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function playCrunch(){
+  try{
+    const ctx=getAudio();
+    const buf=ctx.createBuffer(1,ctx.sampleRate*.05,ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    const src=ctx.createBufferSource();
+    src.buffer=buf;
+    const g=ctx.createGain();g.gain.value=0.18;
+    src.connect(g);g.connect(ctx.destination);src.start();
+  }catch(e){}
+}
+function playSuccess(){
+  [523,659,784].forEach((f,i)=>setTimeout(()=>playPop(f,.12),i*80));
+}
+
+// Add sounds to buttons and interactive elements
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>playPop(600,.06,'square')));
+document.querySelectorAll('.mcard-add').forEach(b=>b.addEventListener('click',()=>playSuccess()));
+document.querySelectorAll('.qb').forEach(b=>b.addEventListener('click',()=>playPop(400,.05)));
+document.getElementById('tempSlider').addEventListener('input',()=>playPop(300+Math.random()*200,.04,'sine'));
+
+// ─────────────────────────────────────────
+// PARTICLE CANVAS — floating flour dots
+// ─────────────────────────────────────────
+(function initCanvas(){
+  const canvas=document.getElementById('hero-canvas');
+  if(!canvas)return;
+  const hero=canvas.parentElement;
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+
+  function resize(){
+    W=canvas.width=hero.offsetWidth;
+    H=canvas.height=hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize',()=>{resize();initParticles();});
+
+  function initParticles(){
+    particles=Array.from({length:55},()=>makeP());
+  }
+  function makeP(fromBottom=false){
+    return{
+      x:Math.random()*W,
+      y:fromBottom?H+10:Math.random()*H,
+      r:Math.random()*2.5+.5,
+      vx:(Math.random()-.5)*.25,
+      vy:-(Math.random()*.4+.1),
+      o:Math.random()*.35+.05,
+      pulse:Math.random()*Math.PI*2,
+    };
+  }
+  initParticles();
+
+  let mouseX=-1000,mouseY=-1000;
+  document.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    mouseX=e.clientX-rect.left;mouseY=e.clientY-rect.top;
+  });
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach((p,i)=>{
+      // repel from mouse
+      const dx=p.x-mouseX,dy=p.y-mouseY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<80){
+        p.vx+=(dx/dist)*.04;
+        p.vy+=(dy/dist)*.04;
+      }
+      p.vx*=.98;p.vy*=.98;
+      p.x+=p.vx;p.y+=p.vy;
+      p.pulse+=.02;
+      const ao=p.o*(0.7+0.3*Math.sin(p.pulse));
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${ao})`;
+      ctx.fill();
+      // respawn
+      if(p.y<-10||p.x<-10||p.x>W+10)particles[i]=makeP(true);
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ─────────────────────────────────────────
+// GLITCH on scroll
+// ─────────────────────────────────────────
+const glitchEl=document.querySelector('.glitch');
+let lastScrollY=0,glitchTimeout=null;
+window.addEventListener('scroll',()=>{
+  const dy=Math.abs(window.scrollY-lastScrollY);
+  lastScrollY=window.scrollY;
+  if(dy>40&&glitchEl){
+    glitchEl.classList.add('active');
+    clearTimeout(glitchTimeout);
+    glitchTimeout=setTimeout(()=>glitchEl.classList.remove('active'),200);
+  }
+},{passive:true});
+
+// ─────────────────────────────────────────
+// 3D TILT on feat-row cards
+// ─────────────────────────────────────────
+document.querySelectorAll('.feat-row').forEach(row=>{
+  row.addEventListener('mousemove',e=>{
+    const rect=row.getBoundingClientRect();
+    const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    const dx=(e.clientX-cx)/rect.width,dy=(e.clientY-cy)/rect.height;
+    row.style.transform=`perspective(1200px) rotateY(${dx*3}deg) rotateX(${-dy*2}deg)`;
+  });
+  row.addEventListener('mouseleave',()=>{
+    row.style.transform='perspective(1200px) rotateY(0deg) rotateX(0deg)';
+  });
+});
+
+// ─────────────────────────────────────────
+// TOAST NOTIFICATION
+// ─────────────────────────────────────────
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  const m=document.getElementById('toastMsg');
+  const b=document.getElementById('toastBar');
+  m.textContent=msg;
+  t.classList.add('on');
+  b.style.animation='none';
+  void b.offsetWidth;
+  b.style.animation='toastTimer 3s linear forwards';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('on'),3200);
+}
+
+// ─────────────────────────────────────────
+// EASTER EGG — logo click 5x
+// ─────────────────────────────────────────
+let logoClicks=0,logoTimer=null;
+document.getElementById('navLogo').addEventListener('click',()=>{
+  playCrunch();
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer=setTimeout(()=>logoClicks=0,1500);
+  if(logoClicks>=5){
+    logoClicks=0;
+    document.getElementById('eggOverlay').classList.add('on');
+    playSuccess();
+  } else if(logoClicks===1){
+    showToast('🍕 continue clicando…');
+  }
+});
+function closeEgg(){
+  document.getElementById('eggOverlay').classList.remove('on');
+  playPop(200,.2,'sawtooth');
+}
+
+// ─────────────────────────────────────────
+// NAV SCROLL
+// ─────────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40);
+},{passive:true});
+
+// ─────────────────────────────────────────
+// HERO BG PARALLAX
+// ─────────────────────────────────────────
+const heroBg=document.getElementById('heroBg');
+heroBg.classList.add('loaded');
+window.addEventListener('scroll',()=>{
+  heroBg.style.transform=`translateY(${window.scrollY*.3}px) scale(1.05)`;
+},{passive:true});
+
+// ─────────────────────────────────────────
+// REVEAL + COUNTER
+// ─────────────────────────────────────────
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('vis');
+      e.target.querySelectorAll('[data-count]').forEach(el=>animCount(el));
+    }
+  });
+},{threshold:.08});
+document.querySelectorAll('.rv').forEach(r=>obs.observe(r));
+
+const cardObs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const cards=e.target.querySelectorAll('.mcard:not([style*="display:none"])');
+      cards.forEach((c,i)=>{c.style.transitionDelay=(i*.06)+'s';c.classList.add('vis');});
+    }
+  });
+},{threshold:.05});
+document.querySelectorAll('.menu-grid').forEach(g=>cardObs.observe(g));
+
+function animCount(el){
+  const target=parseInt(el.dataset.count);
+  const unit=el.innerHTML.match(/<span[^>]*>.*?<\/span>/)?.[0]||'';
+  if(target===0){el.innerHTML='0'+unit;return;}
+  const dur=900,start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.innerHTML=Math.round(ease*target)+unit;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ─────────────────────────────────────────
+// RIPPLE
+// ─────────────────────────────────────────
+function addRipple(e,el){
+  const rect=el.getBoundingClientRect();
+  const r=document.createElement('span');r.className='ripple';
+  const size=Math.max(rect.width,rect.height)*2;
+  r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
+  el.appendChild(r);setTimeout(()=>r.remove(),700);
+}
+document.querySelectorAll('.stats-cell,.mcard').forEach(el=>el.addEventListener('click',e=>{addRipple(e,el);playCrunch();}));
+
+// ─────────────────────────────────────────
+// MAGNETIC BUTTONS
+// ─────────────────────────────────────────
+document.querySelectorAll('.mag').forEach(el=>{
+  el.addEventListener('mousemove',e=>{
+    const rect=el.getBoundingClientRect();
+    const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    el.style.transform=`translate(${(e.clientX-cx)*.18}px,${(e.clientY-cy)*.18}px)`;
+  });
+  el.addEventListener('mouseleave',()=>el.style.transform='');
+});
+
+// ─────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────
+function setTab(btn,cat){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const cards=document.querySelectorAll('.mcard');
+  let vi=0;
+  cards.forEach(c=>{
+    const show=c.dataset.c===cat;
+    c.style.display=show?'':'none';
+    if(show){
+      c.classList.remove('vis');
+      c.style.transitionDelay=(vi*.05)+'s';
+      setTimeout(()=>c.classList.add('vis'),30);
+      vi++;
+    }
+  });
+}
+document.querySelectorAll('.mcard[data-c="t"]').forEach((c,i)=>{
+  c.style.transitionDelay=(i*.07)+'s';
+  setTimeout(()=>c.classList.add('vis'),200+i*70);
+});
+
+// ─────────────────────────────────────────
+// TEMPERATURE WIDGET + OVEN MODE
+// ─────────────────────────────────────────
+let ovenModeActive=false;
+function updateTemp(v){
+  v=parseInt(v);
+  const pct=((v-150)/(500-150))*100;
+  document.getElementById('tempFill').style.width=pct+'%';
+  document.getElementById('tempBarFill').style.width=pct+'%';
+
+  let color='#fff';
+  if(v<=250)color='#4fc3f7';
+  else if(v<=320)color='#ffb74d';
+  else if(v<=450)color=v>=370&&v<=390?'#ff4422':'#ff8a65';
+  else color='#ff1744';
+
+  document.getElementById('tempVal').style.color=color;
+  document.getElementById('tempVal').innerHTML=v+'<span class="unit">°C</span>';
+  document.getElementById('tempBarFill').style.background=color;
+
+  const s={
+    cold:{d:'Baixo demais. A crosta vai ficar molinha. Não é crime, mas é triste.',r:'FRIO',e:'❄️'},
+    warm:{d:'Razoável. Dá pra assar. Mas "razoável" não é o que a Bonna Massa busca.',r:'MORNO',e:'🌡️'},
+    good:{d:'Perfeito. Crosta crocante garantida. Queijo derretido na medida. Aprovado pelo forno e pela equipe.',r:'ÓTIMO',e:'🔥'},
+    hot:{d:'Quente demais. A pizza vira carvão. Bonito de longe, horrível de perto. Como algumas tendências.',r:'DEMAIS',e:'💀'},
+  };
+  let d=s.hot;
+  if(v<=250)d=s.cold;
+  else if(v<=320)d=s.warm;
+  else if(v<=450)d=s.good;
+  document.getElementById('tempDesc').textContent=d.d;
+  document.getElementById('tempRating').textContent=d.r;
+  document.getElementById('tempRating').style.color=color;
+  document.getElementById('tempEmoji').textContent=d.e;
+
+  // OVEN MODE at 380°C ±5
+  const isOven=v>=375&&v<=385;
+  const banner=document.getElementById('ovenBanner');
+  if(isOven&&!ovenModeActive){
+    ovenModeActive=true;
+    document.body.classList.add('oven-mode');
+    banner.classList.add('on');
+    playSuccess();
+    showToast('🔥 Temperatura perfeita atingida!');
+    setTimeout(()=>banner.classList.remove('on'),4000);
+  } else if(!isOven&&ovenModeActive){
+    ovenModeActive=false;
+    document.body.classList.remove('oven-mode');
+  }
+}
+
+// ─────────────────────────────────────────
+// ENCODER
+// ─────────────────────────────────────────
+function doEncode(){
+  const v=document.getElementById('encIn').value.trim();
+  const out=document.getElementById('encOut');
+  if(!v){out.textContent='Escreva algo primeiro…';out.classList.remove('has-val');return;}
+  out.textContent=btoa(unescape(encodeURIComponent(v)));
+  out.classList.add('has-val');
+  playPop(880,.1);
+}
+function doDecode(){
+  const v=document.getElementById('encIn').value.trim();
+  const out=document.getElementById('encOut');
+  try{
+    out.textContent=decodeURIComponent(escape(atob(v)));
+    out.classList.add('has-val');
+    playPop(660,.1);
+  }catch{
+    out.textContent='Não é base64 válido. Tente novamente.';
+    out.classList.remove('has-val');
+    playPop(180,.15,'sawtooth');
+  }
+}
+
+// ─────────────────────────────────────────
+// CART
+// ─────────────────────────────────────────
+let cart=[];
+function openCart(){document.getElementById('cdr').classList.add('on');document.getElementById('cov').classList.add('on');playPop(500,.06);}
+function closeCart(){document.getElementById('cdr').classList.remove('on');document.getElementById('cov').classList.remove('on');playPop(400,.05);}
+function addCart(name,price,btn){
+  const ex=cart.find(i=>i.name===name);
+  if(ex)ex.qty++;else cart.push({name,price,qty:1});
+  renderCart();
+  const sp=btn.querySelector('span');
+  const o=sp.textContent;sp.textContent='✓ Adicionado';btn.classList.add('done');
+  setTimeout(()=>{sp.textContent=o;btn.classList.remove('done');},1200);
+  showToast(`🍕 ${name} adicionada!`);
+  openCart();
+}
+function chq(name,d){
+  const idx=cart.findIndex(i=>i.name===name);
+  if(idx<0)return;
+  cart[idx].qty+=d;
+  if(cart[idx].qty<=0)cart.splice(idx,1);
+  renderCart();
+  playPop(d>0?500:350,.05);
+}
+function renderCart(){
+  const body=document.getElementById('cdb'),empty=document.getElementById('cdempty'),
+    foot=document.getElementById('cdfoot'),badge=document.getElementById('cdot'),
+    total=document.getElementById('cdtv'),wa=document.getElementById('cwa');
+  const qty=cart.reduce((s,i)=>s+i.qty,0),val=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  badge.textContent=qty;badge.classList.toggle('on',qty>0);
+  empty.style.display=cart.length?'none':'flex';
+  foot.style.display=cart.length?'block':'none';
+  total.textContent='R$ '+val.toFixed(2).replace('.',',');
+  body.querySelectorAll('.ci').forEach(e=>e.remove());
+  cart.forEach(item=>{
+    const el=document.createElement('div');el.className='ci';
+    el.innerHTML=`<div style="flex:1"><div class="ci-n">${item.name}</div><div class="ci-p">R$ ${(item.price*item.qty).toFixed(2).replace('.',',')}</div></div><div class="ci-q"><button class="qb" onclick="chq('${item.name}',-1)">−</button><span class="qn">${item.qty}</span><button class="qb" onclick="chq('${item.name}',1)">+</button></div>`;
+    body.insertBefore(el,empty);
+  });
+  if(cart.length){
+    let msg='🍕 *Pedido Bonna Massa*%0A%0A';
+    cart.forEach(i=>{msg+=`• ${i.name} x${i.qty} — R$ ${(i.price*i.qty).toFixed(2).replace('.',',')}%0A`;});
+    msg+=`%0A*Total: R$ ${val.toFixed(2).replace('.',',')}*`;
+    wa.href=`https://wa.me/5583996796429?text=${msg}`;
+  }
+}
+</script>
+</body>
+</html>
